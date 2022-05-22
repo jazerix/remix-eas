@@ -8,22 +8,40 @@ import { json } from "@remix-run/node";
 import MongoWrapper from "~/modules/mongodb.server";
 
 type LoaderData = {
-  device: string;
-  location: {
-    lng: number;
-    lat: number;
-  };
-}[];
+  apiKey: string;
+  mongo: [
+    {
+      device: string;
+      location: {
+        lng: number;
+        lat: number;
+      };
+    }
+  ];
+};
 
 export const loader: LoaderFunction = async () => {
-  const data = await MongoWrapper.devices().find().toArray();
+  const mongo = await MongoWrapper.devices().find().toArray();
+  return json({
+    apiKey: process.env.GOOGLE_MAPS_API,
+    mongo,
+  });
+};
 
-  return json(data);
+export const apiKeyLoader: LoaderFunction = async () => {
+  return json<ApiKey>({
+    key: process.env.GOOGLE_MAPS_API as string,
+  });
+};
+
+type ApiKey = {
+  key: string;
 };
 
 export default function Index() {
   const [showSoundWindow, setShowSoundWindow] = useState<null | number>(null);
-  const devices = useLoaderData<LoaderData>();
+  const data = useLoaderData<LoaderData>();
+  console.log(data);
 
   return (
     <>
@@ -33,14 +51,18 @@ export default function Index() {
         )}
         <div className="relative">
           <AudioMap
-            markers={devices.map((device) => {
+            markers={data.mongo.map((device) => {
               return {
                 lat: device.location.lat,
                 lng: device.location.lng,
                 action: () => setShowSoundWindow(1),
               };
             })}
-            googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2h781HrZK2Y5-Tnm9Y11Mjd9BuTqtM2c&v=3.exp"
+            googleMapURL={
+              "https://maps.googleapis.com/maps/api/js?key=" +
+              data.apiKey +
+              "&v=3.exp"
+            }
             loadingElement={<div style={{ height: `100%` }} />}
             containerElement={<div style={{ height: `calc(100vh - 52px)` }} />}
             mapElement={<div style={{ height: `100%` }} />}
