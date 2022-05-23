@@ -2,7 +2,7 @@ import AudioMap from "~/components/audioMap";
 
 import SoundWindow from "~/components/soundWindow";
 import { useState } from "react";
-import { useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import MongoWrapper from "~/modules/mongodb.server";
@@ -38,7 +38,7 @@ type ApiKey = {
   key: string;
 };
 
-export default function Index() {
+export default function Layout() {
   const [showSoundWindow, setShowSoundWindow] = useState<null | number>(null);
   const data = useLoaderData<LoaderData>();
   console.log(data);
@@ -49,6 +49,7 @@ export default function Index() {
         {showSoundWindow != null && (
           <SoundWindow close={() => setShowSoundWindow(null)} />
         )}
+        <Outlet />
         <div className="relative">
           <AudioMap
             markers={data.mongo.map((device) => {
