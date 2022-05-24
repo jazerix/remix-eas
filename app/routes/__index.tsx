@@ -1,8 +1,12 @@
 import AudioMap from "~/components/audioMap";
 
-import SoundWindow from "~/components/soundWindow";
 import { useState } from "react";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import MongoWrapper from "~/modules/mongodb.server";
@@ -11,7 +15,7 @@ type LoaderData = {
   apiKey: string;
   mongo: [
     {
-      device: string;
+      name: string;
       location: {
         lng: number;
         lat: number;
@@ -39,24 +43,31 @@ type ApiKey = {
 };
 
 export default function Layout() {
-  const [showSoundWindow, setShowSoundWindow] = useState<null | number>(null);
   const data = useLoaderData<LoaderData>();
-  console.log(data);
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  let navigate = useNavigate();
+
+  let center = searchParams.has("lat")
+    ? {
+        lat: Number(searchParams.get("lat")),
+        lng: Number(searchParams.get("lng")) - 0.05,
+      }
+    : { lat: 56.093, lng: 10.615 };
 
   return (
     <>
       <div className="relative">
-        {showSoundWindow != null && (
-          <SoundWindow close={() => setShowSoundWindow(null)} />
-        )}
         <Outlet />
         <div className="relative">
           <AudioMap
+            center={center}
+            zoomLevel={searchParams.has("lat") ? 13 : 7}
             markers={data.mongo.map((device) => {
               return {
                 lat: device.location.lat,
                 lng: device.location.lng,
-                action: () => setShowSoundWindow(1),
+                action: () => navigate(`/devices/${device.name}`),
               };
             })}
             googleMapURL={

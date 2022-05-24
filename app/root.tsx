@@ -21,7 +21,7 @@ export function links() {
     { rel: "stylesheet", href: styles },
     {
       rel: "preload",
-      href: "fonts/Nexa-Bold.woff2",
+      href: "/fonts/Nexa-Bold.woff2",
       as: "font",
       type: "font/woff2",
     },

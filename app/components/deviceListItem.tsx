@@ -10,7 +10,7 @@ type Props = {
   apiKey: string;
 };
 
-export default function Device(props: Props) {
+export default function DeviceListItem(props: Props) {
   const [address, setAddress] = useState<null | string>(null);
   fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${props.lat},${props.lng}&key=${props.apiKey}`
@@ -19,8 +19,6 @@ export default function Device(props: Props) {
       setAddress(j.results[0].formatted_address);
     })
   );
-
-  //const timer = setInterval(() => console.log("hello"), 1000);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,7 +31,7 @@ export default function Device(props: Props) {
   const online = false;
   return (
     <Link
-      to="/"
+      to={`/devices/${props.name}?lat=${props.lat}&lng=${props.lng}`}
       className="relative px-4 bg-white py-4 rounded-md border-2 border-gray-400 hover:shadow-md cursor-pointer flex items-center mb-5"
     >
       {online ? (

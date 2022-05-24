@@ -6,6 +6,11 @@ import withScriptjs from "react-google-maps/lib/withScriptjs";
 
 interface Props extends GoogleMapProps {
   markers: MarkerInterface[];
+  center: {
+    lat: number;
+    lng: number;
+  };
+  zoomLevel: number;
 }
 
 interface MarkerInterface {
@@ -22,8 +27,8 @@ const maps = withScriptjs(
         streetViewControl: false,
         mapTypeControl: false,
       }}
-      defaultZoom={7}
-      defaultCenter={{ lat: 56.093, lng: 10.615 }}
+      defaultZoom={props.zoomLevel}
+      defaultCenter={props.center}
     >
       {props.markers.map((m, i) => (
         <Marker

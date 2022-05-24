@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 
 export default class MongoWrapepr {
   public static samples(): Collection {
-    let client = new MongoClient("mongodb://localhost:27017");
+    let client = new MongoClient("mongodb://157.90.236.62:27017");
     client.connect();
 
     const db = client.db("eas");
@@ -14,7 +14,7 @@ export default class MongoWrapepr {
   }
 
   public static devices(): Collection {
-    let client = new MongoClient("mongodb://localhost:27017");
+    let client = new MongoClient("mongodb://157.90.236.62:27017");
     client.connect();
 
     const db = client.db("eas");

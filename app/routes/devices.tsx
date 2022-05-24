@@ -1,7 +1,8 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import React from "react";
-import Device from "~/components/device";
+import DeviceListItem from "~/components/deviceListItem";
 import MongoWrapper from "~/modules/mongodb.server";
 
 type Props = {};
@@ -10,7 +11,7 @@ type LoaderData = {
   apiKey: string;
   devices: {
     _id: string;
-    device: string;
+    name: string;
     location: {
       lat: number;
       lng: number;
@@ -34,14 +35,14 @@ export const loader: LoaderFunction = async () => {
       {
         $lookup: {
           from: "samples",
-          localField: "device",
+          localField: "name",
           foreignField: "device",
           as: "samples",
         },
       },
       {
         $project: {
-          device: "$device",
+          name: "$name",
           location: "$location",
           sampleCount: {
             $size: "$samples",
@@ -54,6 +55,7 @@ export const loader: LoaderFunction = async () => {
     ])
     .toArray();
 
+  console.log(devices);
   return json({
     devices,
     apiKey: process.env.GOOGLE_MAPS_API,
@@ -70,9 +72,9 @@ export default function Devices(props: Props) {
         <div>
           <div className="flex items-center mt-4 mb-2"></div>
           {data.devices.map((device) => (
-            <Device
+            <DeviceListItem
               apiKey={data.apiKey}
-              name={device.device}
+              name={device.name}
               lat={device.location.lat}
               lng={device.location.lng}
               key={device._id}
