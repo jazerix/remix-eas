@@ -17,6 +17,10 @@ type LoaderData = {
       lng: number;
     };
     sampleCount: number;
+    ping: {
+      latency: number | null;
+      last: Date;
+    };
     last:
       | undefined
       | {
@@ -43,6 +47,7 @@ export const loader: LoaderFunction = async () => {
       {
         $project: {
           name: "$name",
+          ping: "$ping",
           location: "$location",
           sampleCount: {
             $size: "$samples",
@@ -74,6 +79,7 @@ export default function Devices(props: Props) {
           {data.devices.map((device) => (
             <DeviceListItem
               apiKey={data.apiKey}
+              lastPing={device.ping.last}
               name={device.name}
               lat={device.location.lat}
               lng={device.location.lng}

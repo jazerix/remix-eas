@@ -1,4 +1,6 @@
-import { useFetcher } from "@remix-run/react";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -8,9 +10,13 @@ type Props = {
   lng: number;
   sampleCount: number;
   apiKey: string;
+  lastPing: Date;
 };
 
 export default function DeviceListItem(props: Props) {
+  dayjs.extend(duration);
+  dayjs.extend(relativeTime);
+
   const [address, setAddress] = useState<null | string>(null);
   fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${props.lat},${props.lng}&key=${props.apiKey}`
@@ -28,7 +34,9 @@ export default function DeviceListItem(props: Props) {
     return () => clearInterval(interval);
   }, []);
 
-  const online = false;
+  const lastPingDuration = dayjs.duration(dayjs().diff(dayjs(props.lastPing)));
+  const online = lastPingDuration.asMinutes() < 5;
+
   return (
     <Link
       to={`/devices/${props.name}?lat=${props.lat}&lng=${props.lng}`}
@@ -67,24 +75,26 @@ export default function DeviceListItem(props: Props) {
           Long: <span className="font-thin">{props.lng}</span>
         </span>
       </div>
-      <div className="w-3/12">{address}</div>
+      <div className="w-4/12">{address}</div>
       {online ? (
-        <div className="flex flex-col w-2/12">
+        <div className="flex flex-col w-3/12">
           <span>Online</span>
           <span className="text-sm -mt-2 font-thin text-indigo-600">
-            Last ping 12s ago
+            Last ping {lastPingDuration.humanize()} ago
           </span>
         </div>
       ) : (
         <div className="flex flex-col w-2/12">
           <span>Offline</span>
           <span className="text-sm -mt-2 font-thin text-indigo-600">
-            Last seen 4 days ago
+            Last seen {lastPingDuration.humanize()} ago
           </span>
         </div>
       )}
       <div className="flex flex-col w-1/12">
-        <span className="text-lg font-">{props.sampleCount}</span>
+        <span className="text-lg font-">
+          {props.sampleCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </span>
         <span className="text-sm -mt-2 font-thin text-indigo-600">Samples</span>
       </div>
     </Link>

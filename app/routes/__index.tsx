@@ -53,7 +53,7 @@ export default function Layout() {
         lat: Number(searchParams.get("lat")),
         lng: Number(searchParams.get("lng")) - 0.05,
       }
-    : { lat: 56.093, lng: 10.615 };
+    : { lat: 55.401728, lng: 10.381953 };
 
   return (
     <>
@@ -62,7 +62,7 @@ export default function Layout() {
         <div className="relative">
           <AudioMap
             center={center}
-            zoomLevel={searchParams.has("lat") ? 13 : 7}
+            zoomLevel={searchParams.has("lat") ? 13 : 12}
             markers={data.mongo.map((device) => {
               return {
                 lat: device.location.lat,
