@@ -26,14 +26,6 @@ export default function DeviceListItem(props: Props) {
     })
   );
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log("This will be called every 2 seconds");
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const lastPingDuration = dayjs.duration(dayjs().diff(dayjs(props.lastPing)));
   const online = lastPingDuration.asMinutes() < 5;
 
